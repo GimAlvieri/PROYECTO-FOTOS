@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registro fotográfico de fiscalización</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header class="cabecera">
+    <h1>Registro fotográfico de fiscalización</h1>
+    <p>Práctica con datos ficticios. Todo se guarda en este navegador.</p>
+  </header>
+
+  <main>
+    <!-- 1. PROYECTO -->
+    <section class="panel" aria-labelledby="t-proyecto">
+      <h2 id="t-proyecto">1. Proyecto</h2>
+
+      <div class="fila-selector">
+        <div class="campo">
+          <label for="selProyecto">Proyecto guardado</label>
+          <select id="selProyecto"></select>
+        </div>
+        <button id="btnNuevo" type="button" class="btn secundario">Nuevo proyecto</button>
+      </div>
+
+      <form id="formProyecto" novalidate>
+        <div class="rejilla-form">
+          <div class="campo">
+            <label for="codigo">Código de práctica</label>
+            <input id="codigo" name="codigo" type="text" autocomplete="off" placeholder="PRACTICA 001" aria-describedby="err-codigo">
+            <span class="error-campo" id="err-codigo"></span>
+          </div>
+          <div class="campo">
+            <label for="fecha">Fecha</label>
+            <input id="fecha" name="fecha" type="date" aria-describedby="err-fecha">
+            <span class="error-campo" id="err-fecha"></span>
+          </div>
+          <div class="campo">
+            <label for="lugar">Lugar</label>
+            <input id="lugar" name="lugar" type="text" autocomplete="off" placeholder="Espacio de práctica autorizado" aria-describedby="err-lugar">
+            <span class="error-campo" id="err-lugar"></span>
+          </div>
+          <div class="campo">
+            <label for="fiscalizador">Fiscalizador</label>
+            <input id="fiscalizador" name="fiscalizador" type="text" autocomplete="off" placeholder="Alumno de práctica" aria-describedby="err-fiscalizador">
+            <span class="error-campo" id="err-fiscalizador"></span>
+          </div>
+          <div class="campo ancho-completo">
+            <label for="establecimiento">Establecimiento o unidad (nombre ficticio)</label>
+            <input id="establecimiento" name="establecimiento" type="text" autocomplete="off" placeholder="Unidad de práctica A" aria-describedby="err-establecimiento">
+            <span class="error-campo" id="err-establecimiento"></span>
+          </div>
+        </div>
+        <div class="acciones">
+          <button id="btnGuardarProyecto" type="submit" class="btn primario">Guardar proyecto</button>
+          <button id="btnEliminarProyecto" type="button" class="btn peligro">Eliminar proyecto</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- 2. FOTOGRAFIAS -->
+    <section class="panel" aria-labelledby="t-fotos">
+      <h2 id="t-fotos">2. Fotografías</h2>
+      <p id="avisoSinProyecto" class="aviso-caja">Guarda un proyecto para poder agregar fotos.</p>
+
+      <div class="acciones">
+        <button id="btnTomar" type="button" class="btn primario">Tomar foto</button>
+        <button id="btnAgregar" type="button" class="btn secundario">Agregar imágenes</button>
+      </div>
+      <input id="inpCamara" type="file" accept="image/*" capture="environment" hidden>
+      <input id="inpArchivos" type="file" accept="image/*" multiple hidden>
+
+      <p class="nota">
+        La fecha y hora de cada foto es el momento en que se incorporó a esta aplicación.
+        No certifica la fecha original de la imagen.
+      </p>
+
+      <div class="controles-galeria">
+        <div class="campo">
+          <label for="buscarFotos">Buscar fotos registradas</label>
+          <input id="buscarFotos" type="search" autocomplete="off" placeholder="Número, nombre de archivo o descripción">
+        </div>
+        <div class="campo">
+          <label for="filtroFotos">Mostrar</label>
+          <select id="filtroFotos">
+            <option value="todas">Todas las fotos</option>
+            <option value="descritas">Con descripción</option>
+            <option value="pendientes">Pendientes de descripción</option>
+          </select>
+        </div>
+      </div>
+      <p id="resumenFotos" class="resumen-fotos" aria-live="polite"></p>
+      <ol id="galeria" class="galeria" aria-label="Galería de fotografías"></ol>
+    </section>
+
+    <!-- 3. ANEXO -->
+    <section class="panel" aria-labelledby="t-anexo">
+      <h2 id="t-anexo">3. Vista previa del anexo</h2>
+      <div id="vistaPrevia" class="contenedor-anexo"></div>
+
+      <div id="panelProblemas" class="problemas" role="alert" hidden></div>
+
+      <div class="acciones">
+        <button id="btnGenerar" type="button" class="btn primario grande">Generar Word</button>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="dlgCamara" aria-labelledby="dlgCamaraTitulo">
+    <h2 id="dlgCamaraTitulo">Tomar foto con la cámara</h2>
+    <video id="videoCamara" autoplay playsinline></video>
+    <p id="estadoCamara" class="nota">Iniciando cámara…</p>
+    <div class="acciones">
+      <button id="btnCapturar" type="button" class="btn primario" disabled>Capturar foto</button>
+      <button id="btnCerrarCamara" type="button" class="btn secundario">Cancelar</button>
+    </div>
+  </dialog>
+
+  <!-- Vista previa antes de confirmar una foto -->
+  <dialog id="dlgFoto" aria-labelledby="dlgFotoTitulo">
+    <form method="dialog">
+      <h2 id="dlgFotoTitulo">Vista previa de la foto</h2>
+      <img id="dlgFotoImg" alt="Vista previa de la foto que se va a agregar">
+      <div class="campo">
+        <label for="dlgFotoDescripcion">Descripción (puedes completarla después)</label>
+        <textarea id="dlgFotoDescripcion" rows="3" maxlength="500"></textarea>
+      </div>
+      <div class="acciones">
+        <button type="submit" value="confirmar" class="btn primario">Confirmar y guardar</button>
+        <button type="submit" value="descartar" class="btn secundario" formnovalidate>Descartar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Confirmación genérica -->
+  <dialog id="dlgConfirmar" aria-labelledby="dlgConfirmarTexto">
+    <form method="dialog">
+      <p id="dlgConfirmarTexto"></p>
+      <div class="acciones">
+        <button type="submit" value="si" class="btn peligro">Sí, continuar</button>
+        <button type="submit" value="no" class="btn secundario" autofocus>Cancelar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="mensajes" class="mensajes" aria-live="polite"></div>
+
+  <script src="https://unpkg.com/docx@9.5.0/dist/index.umd.cjs"></script>
+  <script src="Db.js"></script>
+  <script src="Exportar.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
